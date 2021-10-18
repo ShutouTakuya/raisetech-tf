@@ -37,4 +37,10 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# SSH keys
+key_pair.tf
+keys
+*.pub
+*.pem
+
 # End of https://www.toptal.com/developers/gitignore/api/terraform
