@@ -9,6 +9,12 @@ terraform {
       version = "~>3.0"
     }
   }
+  backend "s3" {
+    bucket  = "raisetech-tfstate-bucket-1019"
+    key     = "raisetech-dev.tfstate"
+    region  = "ap-northeast-1"
+    profile = "terraform-shutou"
+  }
 }
 
 # -------------------------------------
