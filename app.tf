@@ -16,11 +16,15 @@
 # # ec2 instance
 # # -------------------------------------
 # resource "aws_instance" "app_server" {
-#   ami                    = data.aws_ami.app.id
-#   instance_type          = "t2.micro"
-#   subnet_id              = aws_subnet.web_app_private_subnet_1a.id
-#   vpc_security_group_ids = [aws_security_group.app_sg.id]
-#   key_name               = aws_key_pair.keypair.key_name
+#   ami                  = data.aws_ami.app.id
+#   instance_type        = "t2.micro"
+#   subnet_id            = aws_subnet.web_app_private_subnet_1a.id
+#   iam_instance_profile = aws_iam_instance_profile.app_ec2_profile.name
+#   vpc_security_group_ids = [
+#     aws_security_group.app_sg.id,
+#     aws_security_group.opmng_sg.id
+#   ]
+#   key_name = aws_key_pair.keypair.key_name
 
 #   tags = {
 #     Name    = "${var.project}-${var.env}-app-server-1a"
