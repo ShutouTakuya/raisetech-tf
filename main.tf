@@ -22,7 +22,7 @@ terraform {
 # -------------------------------------
 provider "aws" {
   profile = var.profile
-  region  = "ap-northeast-1"
+  region  = var.region
 }
 
 provider "http" {
