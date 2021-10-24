@@ -148,35 +148,35 @@ resource "aws_route" "front_public_rt_igw_route" {
 # -------------------------------------
 # Nat Gateway
 # -------------------------------------
-resource "aws_eip" "public_ngw_1a_eip" {
-  vpc = true
+# resource "aws_eip" "public_ngw_1a_eip" {
+#   vpc = true
 
-  tags = {
-    Name    = "${var.project}-${var.env}-public-ngw-1a-eip"
-    Project = var.project
-    Env     = var.env
-    Type    = "public"
-  }
-}
+#   tags = {
+#     Name    = "${var.project}-${var.env}-public-ngw-1a-eip"
+#     Project = var.project
+#     Env     = var.env
+#     Type    = "public"
+#   }
+# }
 
-resource "aws_nat_gateway" "public_ngw_1a" {
-  allocation_id     = aws_eip.public_ngw_1a_eip.id
-  subnet_id         = aws_subnet.front_public_subnets[0].id
-  connectivity_type = "public"
+# resource "aws_nat_gateway" "public_ngw_1a" {
+#   allocation_id     = aws_eip.public_ngw_1a_eip.id
+#   subnet_id         = aws_subnet.front_public_subnets[0].id
+#   connectivity_type = "public"
 
-  tags = {
-    Name    = "${var.project}-${var.env}-public-ngw-1a"
-    Project = var.project
-    Env     = var.env
-    Type    = "public"
-  }
+#   tags = {
+#     Name    = "${var.project}-${var.env}-public-ngw-1a"
+#     Project = var.project
+#     Env     = var.env
+#     Type    = "public"
+#   }
 
-  depends_on = [aws_internet_gateway.igw]
-}
+#   depends_on = [aws_internet_gateway.igw]
+# }
 
-resource "aws_route" "web_app_private_rt_ngw_route" {
-  route_table_id         = aws_route_table.web_app_private_rt.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_nat_gateway.public_ngw_1a.id
-}
+# resource "aws_route" "web_app_private_rt_ngw_route" {
+#   route_table_id         = aws_route_table.web_app_private_rt.id
+#   destination_cidr_block = "0.0.0.0/0"
+#   gateway_id             = aws_nat_gateway.public_ngw_1a.id
+# }
 
