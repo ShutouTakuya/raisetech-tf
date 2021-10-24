@@ -52,3 +52,10 @@ variable "vpc" {
     }
   }
 }
+
+# -------------------------------------
+# EC2
+# -------------------------------------
+variable "default_instance_type" {
+  type = string
+}
