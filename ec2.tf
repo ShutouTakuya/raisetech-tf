@@ -138,7 +138,7 @@ resource "aws_autoscaling_group" "web_server_asg" {
     aws_subnet.web_app_private_subnets[0].id,
     aws_subnet.web_app_private_subnets[1].id
   ]
-  target_group_arns = [aws_lb_target_group.alb_taget_group.arn]
+  # target_group_arns = [aws_lb_target_group.alb_taget_group.arn]
 
   mixed_instances_policy {
     launch_template {
@@ -165,7 +165,7 @@ resource "aws_autoscaling_group" "ap_server_asg" {
     aws_subnet.web_app_private_subnets[0].id,
     aws_subnet.web_app_private_subnets[1].id
   ]
-  target_group_arns = [aws_lb_target_group.alb_taget_group.arn]
+  # target_group_arns = [aws_lb_target_group.alb_taget_group.arn]
 
   mixed_instances_policy {
     launch_template {
