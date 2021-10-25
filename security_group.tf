@@ -103,7 +103,7 @@ resource "aws_security_group_rule" "internet_alb_sg_ingress_https" {
 # web security group
 resource "aws_security_group" "web_sg" {
   name        = "${var.project}-${var.env}-web-sg"
-  description = "HTTP and HTTPS from ALB Security Group for Internet"
+  description = "HTTP and HTTPS from Internet ALB Security Group"
   vpc_id      = aws_vpc.vpc.id
 
   tags = {
