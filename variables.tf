@@ -59,3 +59,10 @@ variable "vpc" {
 variable "default_instance_type" {
   type = string
 }
+
+# -------------------------------------
+# DNS
+# -------------------------------------
+variable "domain" {
+  type = string
+}

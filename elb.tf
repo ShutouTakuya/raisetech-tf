@@ -17,11 +17,11 @@ resource "aws_lb" "internet_alb" {
 # internet alb listener
 resource "aws_lb_listener" "internet_alb_listener_http" {
   load_balancer_arn = aws_lb.internet_alb.arn
-  port = 80
-  protocol = "HTTP"
+  port              = 80
+  protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
+    type             = "redirect"
     target_group_arn = aws_lb_target_group.internet_alb_target_group.arn
 
     redirect {
@@ -48,11 +48,11 @@ resource "aws_lb" "internal_alb" {
 # internal alb listener
 resource "aws_lb_listener" "internal_alb_listener_http" {
   load_balancer_arn = aws_lb.internal_alb.arn
-  port = 80
-  protocol = "HTTP"
+  port              = 80
+  protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
+    type             = "redirect"
     target_group_arn = aws_lb_target_group.internal_alb_target_group.arn
 
     redirect {
