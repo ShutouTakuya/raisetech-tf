@@ -71,28 +71,28 @@ resource "aws_security_group_rule" "opmng_sg_egress_https" {
   source_security_group_id = aws_security_group.bastion_sg.id
 }
 
-# internet alb security group
-resource "aws_security_group" "internet_alb_sg" {
-  name        = "${var.project}-${var.env}-internet-alb-sg"
+# external alb security group
+resource "aws_security_group" "external_alb_sg" {
+  name        = "${var.project}-${var.env}-external-alb-sg"
   description = "HTTP and HTTPS from anywhere"
   vpc_id      = aws_vpc.vpc.id
 
   tags = {
-    Name    = "${var.project}-${var.env}-internet-alb-sg"
+    Name    = "${var.project}-${var.env}-external-alb-sg"
     Project = var.project
     Env     = var.env
   }
 }
-resource "aws_security_group_rule" "internet_alb_sg_ingress_http" {
-  security_group_id = aws_security_group.internet_alb_sg.id
+resource "aws_security_group_rule" "external_alb_sg_ingress_http" {
+  security_group_id = aws_security_group.external_alb_sg.id
   type              = "ingress"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
 }
-resource "aws_security_group_rule" "internet_alb_sg_ingress_https" {
-  security_group_id = aws_security_group.internet_alb_sg.id
+resource "aws_security_group_rule" "external_alb_sg_ingress_https" {
+  security_group_id = aws_security_group.external_alb_sg.id
   type              = "ingress"
   from_port         = 443
   to_port           = 443
@@ -103,7 +103,7 @@ resource "aws_security_group_rule" "internet_alb_sg_ingress_https" {
 # web security group
 resource "aws_security_group" "web_sg" {
   name        = "${var.project}-${var.env}-web-sg"
-  description = "HTTP and HTTPS from Internet ALB Security Group"
+  description = "HTTP and HTTPS from External ALB Security Group"
   vpc_id      = aws_vpc.vpc.id
 
   tags = {
@@ -118,7 +118,7 @@ resource "aws_security_group_rule" "web_sg_ingress_http" {
   from_port                = 80
   to_port                  = 80
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.internet_alb_sg.id
+  source_security_group_id = aws_security_group.external_alb_sg.id
 }
 resource "aws_security_group_rule" "web_sg_ingress_https" {
   security_group_id        = aws_security_group.web_sg.id
@@ -126,7 +126,7 @@ resource "aws_security_group_rule" "web_sg_ingress_https" {
   from_port                = 443
   to_port                  = 443
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.internet_alb_sg.id
+  source_security_group_id = aws_security_group.external_alb_sg.id
 }
 resource "aws_security_group_rule" "web_sg_egress_tcp3000" {
   security_group_id        = aws_security_group.web_sg.id

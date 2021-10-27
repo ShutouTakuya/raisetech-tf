@@ -138,7 +138,7 @@ resource "aws_autoscaling_group" "web_server_asg" {
     aws_subnet.web_app_private_subnets[0].id,
     aws_subnet.web_app_private_subnets[1].id
   ]
-  target_group_arns = [aws_lb_target_group.internet_alb_target_group.arn]
+  target_group_arns = [aws_lb_target_group.external_alb_target_group.arn]
 
   mixed_instances_policy {
     launch_template {
@@ -178,4 +178,39 @@ resource "aws_autoscaling_group" "ap_server_asg" {
       }
     }
   }
+}
+
+# -------------------------------------
+# Nat Gateway
+# -------------------------------------
+resource "aws_eip" "public_ngw_1a_eip" {
+  vpc = true
+
+  tags = {
+    Name    = "${var.project}-${var.env}-public-ngw-1a-eip"
+    Project = var.project
+    Env     = var.env
+    Type    = "public"
+  }
+}
+
+resource "aws_nat_gateway" "public_ngw_1a" {
+  allocation_id     = aws_eip.public_ngw_1a_eip.id
+  subnet_id         = aws_subnet.front_public_subnets[0].id
+  connectivity_type = "public"
+
+  tags = {
+    Name    = "${var.project}-${var.env}-public-ngw-1a"
+    Project = var.project
+    Env     = var.env
+    Type    = "public"
+  }
+
+  depends_on = [aws_internet_gateway.igw]
+}
+
+resource "aws_route" "web_app_private_rt_ngw_route" {
+  route_table_id         = aws_route_table.web_app_private_rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_nat_gateway.public_ngw_1a.id
 }
