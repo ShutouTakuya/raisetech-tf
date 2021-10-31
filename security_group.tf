@@ -25,6 +25,14 @@ resource "aws_security_group_rule" "bastion_sg_ingress_ssh" {
   protocol          = "tcp"
   cidr_blocks       = [local.my_ip]
 }
+resource "aws_security_group_rule" "bastion_sg_egress_ssh" {
+  security_group_id = aws_security_group.bastion_sg.id
+  type              = "egress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [local.my_ip]
+}
 
 # opmng security group
 resource "aws_security_group" "opmng_sg" {
@@ -99,6 +107,14 @@ resource "aws_security_group_rule" "external_alb_sg_ingress_https" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
 }
+resource "aws_security_group_rule" "external_alb_sg_egress_all" {
+  security_group_id = aws_security_group.external_alb_sg.id
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
 
 # web security group
 resource "aws_security_group" "web_sg" {
@@ -149,13 +165,29 @@ resource "aws_security_group" "internal_alb_sg" {
     Env     = var.env
   }
 }
-resource "aws_security_group_rule" "internal_alb_sg_ingress_http" {
+resource "aws_security_group_rule" "internal_alb_sg_ingress_tcp3000" {
   security_group_id        = aws_security_group.internal_alb_sg.id
   type                     = "ingress"
   from_port                = 3000
   to_port                  = 3000
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.web_sg.id
+}
+resource "aws_security_group_rule" "internal_alb_sg_egress_http" {
+  security_group_id = aws_security_group.internal_alb_sg.id
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_prefix_list.s3_pl.id]
+}
+resource "aws_security_group_rule" "internal_alb_sg_egress_https" {
+  security_group_id = aws_security_group.internal_alb_sg.id
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_prefix_list.s3_pl.id]
 }
 
 # app security group

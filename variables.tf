@@ -59,6 +59,12 @@ variable "vpc" {
 variable "default_instance_type" {
   type = string
 }
+variable "my_ami_id" {
+  type = string
+}
+variable "key_name" {
+  type = string
+}
 
 # -------------------------------------
 # DNS
