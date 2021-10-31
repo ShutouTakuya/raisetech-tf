@@ -1,16 +1,16 @@
 # -------------------------------------
 # Keypair
 # -------------------------------------
-resource "aws_key_pair" "keypair" {
-  key_name   = "${var.project}-${var.env}-keypair"
-  public_key = file("./keys/raisetech_tf_key.pub")
+# resource "aws_key_pair" "keypair" {
+#   key_name   = "${var.project}-${var.env}-keypair"
+#   public_key = file("./keys/raisetech_tf_key.pub")
 
-  tags = {
-    Name    = "${var.project}-${var.env}-keypair"
-    Project = var.project
-    Env     = var.env
-  }
-}
+#   tags = {
+#     Name    = "${var.project}-${var.env}-keypair"
+#     Project = var.project
+#     Env     = var.env
+#   }
+# }
 
 # # -------------------------------------
 # # SSM Parameter Store
@@ -70,8 +70,9 @@ resource "aws_key_pair" "keypair" {
 resource "aws_launch_template" "web_server_lt" {
   update_default_version = true
   name                   = "${var.project}-${var.env}-web-server-lt"
-  image_id               = data.aws_ami.web_server.image_id
-  key_name               = aws_key_pair.keypair.key_name
+  image_id               = var.my_ami_id
+  key_name               = var.key_name
+  #image_id               = data.aws_ami.web_server.image_id
 
   tag_specifications {
     resource_type = "instance"
@@ -86,42 +87,44 @@ resource "aws_launch_template" "web_server_lt" {
   network_interfaces {
     associate_public_ip_address = false
     security_groups = [
-      aws_security_group.web_sg.id
+      aws_security_group.web_sg.id,
+      aws_security_group.opmng_sg.id
     ]
     delete_on_termination = true
   }
 }
 
 # APサーバー用の起動テンプレート
-resource "aws_launch_template" "ap_server_lt" {
-  update_default_version = true
-  name                   = "${var.project}-${var.env}-ap-server-lt"
-  image_id               = data.aws_ami.ap_server.image_id
-  key_name               = aws_key_pair.keypair.key_name
+# resource "aws_launch_template" "ap_server_lt" {
+#   update_default_version = true
+#   name                   = "${var.project}-${var.env}-ap-server-lt"
+#   image_id               = var.my_ami_id
+#   key_name               = var.key_name
+#   #image_id               = data.aws_ami.ap_server.image_id
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Name    = "${var.project}-${var.env}-ap-server-from-asg"
-      Project = var.project
-      Env     = var.env
-      Type    = "app"
-    }
-  }
+#   tag_specifications {
+#     resource_type = "instance"
+#     tags = {
+#       Name    = "${var.project}-${var.env}-ap-server-from-asg"
+#       Project = var.project
+#       Env     = var.env
+#       Type    = "app"
+#     }
+#   }
 
-  network_interfaces {
-    associate_public_ip_address = false
-    security_groups = [
-      aws_security_group.app_sg.id,
-      aws_security_group.opmng_sg.id
-    ]
-    delete_on_termination = true
-  }
+#   network_interfaces {
+#     associate_public_ip_address = false
+#     security_groups = [
+#       aws_security_group.app_sg.id,
+#       aws_security_group.opmng_sg.id
+#     ]
+#     delete_on_termination = true
+#   }
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.app_ec2_profile.name
-  }
-}
+#   iam_instance_profile {
+#     name = aws_iam_instance_profile.app_ec2_profile.name
+#   }
+# }
 
 # -------------------------------------
 # Auto Scaring Group
@@ -129,7 +132,7 @@ resource "aws_launch_template" "ap_server_lt" {
 # Webサーバー用のAuto Scaring Group
 resource "aws_autoscaling_group" "web_server_asg" {
   name                      = "${var.project}-${var.env}-asg-for-web-server"
-  max_size                  = 6
+  max_size                  = 4
   min_size                  = 2
   desired_capacity          = 2
   health_check_grace_period = 300
@@ -154,31 +157,31 @@ resource "aws_autoscaling_group" "web_server_asg" {
 }
 
 # APサーバー用のAuto Scaring Group
-resource "aws_autoscaling_group" "ap_server_asg" {
-  name                      = "${var.project}-${var.env}-asg-for-ap-server"
-  max_size                  = 4
-  min_size                  = 2
-  desired_capacity          = 2
-  health_check_grace_period = 300
-  health_check_type         = "ELB"
-  vpc_zone_identifier = [
-    aws_subnet.web_app_private_subnets[0].id,
-    aws_subnet.web_app_private_subnets[1].id
-  ]
-  target_group_arns = [aws_lb_target_group.internal_alb_target_group.arn]
+# resource "aws_autoscaling_group" "ap_server_asg" {
+#   name                      = "${var.project}-${var.env}-asg-for-ap-server"
+#   max_size                  = 4
+#   min_size                  = 2
+#   desired_capacity          = 2
+#   health_check_grace_period = 300
+#   health_check_type         = "ELB"
+#   vpc_zone_identifier = [
+#     aws_subnet.web_app_private_subnets[0].id,
+#     aws_subnet.web_app_private_subnets[1].id
+#   ]
+#   target_group_arns = [aws_lb_target_group.internal_alb_target_group.arn]
 
-  mixed_instances_policy {
-    launch_template {
-      launch_template_specification {
-        launch_template_id = aws_launch_template.ap_server_lt.id
-        version            = "$Latest"
-      }
-      override {
-        instance_type = var.default_instance_type
-      }
-    }
-  }
-}
+#   mixed_instances_policy {
+#     launch_template {
+#       launch_template_specification {
+#         launch_template_id = aws_launch_template.ap_server_lt.id
+#         version            = "$Latest"
+#       }
+#       override {
+#         instance_type = var.default_instance_type
+#       }
+#     }
+#   }
+# }
 
 # -------------------------------------
 # Nat Gateway
